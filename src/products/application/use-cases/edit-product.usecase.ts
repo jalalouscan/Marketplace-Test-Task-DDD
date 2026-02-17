@@ -72,8 +72,8 @@ export class EditProductUseCase {
 
     const beforeImages = product.getImages();
 
-    // Substitute replaced IDs in reorder (client sends old target IDs)
-    // Extend with append image IDs at end (client only sends kept-image order)
+    // substitute replaced IDs in reorder (client sends old target IDs)
+    // extend with append image IDs at end (client only sends kept-image order)
     let reorderToImageIds = params.reorderToImageIds;
     if (reorderToImageIds) {
       const replaceById = new Map(
@@ -90,7 +90,7 @@ export class EditProductUseCase {
       }
     }
 
-    // 🔥 Domain logic happens here
+    // domain logic happens here
     product.edit({
       actorId: params.actorId,
       patch: params.patch,
@@ -116,3 +116,4 @@ export class EditProductUseCase {
     return product.toPrimitives();
   }
 }
+
