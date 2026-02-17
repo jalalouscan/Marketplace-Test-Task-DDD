@@ -103,7 +103,10 @@ There’s also a simple server-rendered dashboard (EJS) for product management.
 ### How It Works
 
 1. Open `/dashboard/login`
-2. Log in as a merchant
+2. Log in as a merchant: {
+  "email": "m1@test.com",
+  "password": "123456"
+}
 3. Create products (must upload 1–5 images)
 4. Edit products:
 
@@ -302,4 +305,5 @@ Body fields:
 
 This project isn’t meant to be a full production marketplace.
 It’s meant to demonstrate clean layering, aggregate-based rule enforcement, and a realistic edit workflow handled properly from end to end.
+
 
