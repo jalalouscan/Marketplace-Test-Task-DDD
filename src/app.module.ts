@@ -21,7 +21,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
         password: config.get<string>('DB_PASS'),
         database: config.get<string>('DB_NAME'),
         autoLoadEntities: true,
-        synchronize: true, // OK for test task
+        synchronize: true, 
         logging: true,
       }),
     }),
@@ -34,3 +34,4 @@ import { DashboardModule } from './dashboard/dashboard.module';
   ],
 })
 export class AppModule {}
+
