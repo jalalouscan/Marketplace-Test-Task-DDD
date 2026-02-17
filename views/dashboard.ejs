@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard | Marketplace Admin</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <header class="header">
+    <a href="/dashboard" class="logo">Marketplace Admin</a>
+    <nav class="nav">
+      <span class="user-email"><%= user.email %></span>
+      <a href="/dashboard/logout" class="btn btn-outline">Logout</a>
+    </nav>
+  </header>
+  <main class="main">
+    <h1>Products</h1>
+    <p><a href="/dashboard/products/new" class="btn btn-primary">Add product</a></p>
+    <% if (products.length === 0) { %>
+      <p class="empty">No products yet. Add your first product above.</p>
+    <% } else { %>
+      <div class="table-wrapper">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Image</th>
+              <th>Name</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(function(p) { %>
+              <tr>
+                <td>
+                  <% if (p.images && p.images.length > 0) { %>
+                    <img src="<%= p.images[0].url %>" alt="" class="thumb">
+                  <% } else { %>
+                    <span class="no-image">—</span>
+                  <% } %>
+                </td>
+                <td><%= p.name %></td>
+                <td>$<%= Number(p.price).toFixed(2) %></td>
+                <td><%= p.stock %></td>
+                <td>
+                  <a href="/dashboard/products/<%= p.id %>/edit" class="btn btn-sm">Edit</a>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </main>
+</body>
+</html>

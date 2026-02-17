@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit <%= product.name %> | Marketplace Admin</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <header class="header">
+    <a href="/dashboard" class="logo">Marketplace Admin</a>
+    <nav class="nav">
+      <span class="user-email"><%= user.email %></span>
+      <a href="/dashboard/logout" class="btn btn-outline">Logout</a>
+    </nav>
+  </header>
+  <main class="main">
+    <h1>Edit Product</h1>
+    <a href="/dashboard" class="back-link">← Back to dashboard</a>
+
+    <form method="POST" action="/dashboard/products/<%= product.id %>" enctype="multipart/form-data" class="form card">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" name="name" value="<%= product.name %>" required>
+      </div>
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="3"><%= product.description %></textarea>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="price">Price</label>
+          <input type="number" id="price" name="price" step="0.01" min="0" value="<%= product.price %>" required>
+        </div>
+        <div class="form-group">
+          <label for="stock">Stock</label>
+          <input type="number" id="stock" name="stock" min="0" value="<%= product.stock %>" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Images</label>
+        <ul class="image-list" id="imageList">
+          <% product.images.forEach(function(img) {
+            const url = img.url.startsWith('/') ? img.url : '/' + img.url;
+          %>
+            <li class="image-item" data-image-id="<%= img.id %>" draggable="true">
+              <span class="drag-handle" title="Drag to reorder">⋮⋮</span>
+              <img src="<%= url %>" alt="" class="thumb">
+              <label class="btn-replace">
+                Replace
+                <input type="file" name="replaceFiles" accept="image/*" data-target-id="<%= img.id %>" class="replace-input">
+              </label>
+              <button type="button" class="btn btn-delete">Delete</button>
+            </li>
+          <% }); %>
+        </ul>
+        <p class="help">Drag to reorder. Replace: choose a new image for the same position. Delete to remove. At least one image required. Max 5.</p>
+      </div>
+
+      <div class="form-group">
+        <label for="files">Add new images</label>
+        <input type="file" id="files" name="files" multiple accept="image/*">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Save changes</button>
+        <a href="/dashboard" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </main>
+  <script>
+    (function() {
+      var list = document.getElementById('imageList');
+      var form = list && list.closest('form');
+      if (!list || !form) return;
+
+      list.addEventListener('click', function(e) {
+        var btn = e.target.closest('.btn-delete');
+        if (!btn) return;
+        var item = btn.closest('.image-item');
+        if (!item) return;
+        var id = item.getAttribute('data-image-id');
+        var hid = document.createElement('input');
+        hid.type = 'hidden';
+        hid.name = 'deleteImageIds';
+        hid.value = id;
+        form.appendChild(hid);
+        item.remove();
+      });
+
+      var dragged = null;
+      list.addEventListener('dragstart', function(e) {
+        if (e.target.closest('.image-item')) {
+          dragged = e.target.closest('.image-item');
+          e.dataTransfer.effectAllowed = 'move';
+          e.dataTransfer.setData('text/plain', dragged.getAttribute('data-image-id'));
+          dragged.classList.add('dragging');
+        }
+      });
+      list.addEventListener('dragend', function() {
+        if (dragged) dragged.classList.remove('dragging');
+        dragged = null;
+      });
+      list.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        var item = e.target.closest('.image-item');
+        if (item && dragged && item !== dragged) {
+          var rect = item.getBoundingClientRect();
+          var mid = rect.top + rect.height / 2;
+          if (e.clientY < mid) {
+            list.insertBefore(dragged, item);
+          } else {
+            list.insertBefore(dragged, item.nextSibling);
+          }
+        }
+      });
+
+      list.addEventListener('change', function(e) {
+        var inp = e.target.closest('.replace-input');
+        if (!inp || !inp.files || inp.files.length === 0) return;
+        var item = inp.closest('.image-item');
+        if (!item) return;
+        var thumb = item.querySelector('.thumb');
+        if (!thumb) return;
+        var url = URL.createObjectURL(inp.files[0]);
+        if (thumb._replaceUrl) URL.revokeObjectURL(thumb._replaceUrl);
+        thumb._replaceUrl = url;
+        thumb.src = url;
+      });
+
+      form.addEventListener('submit', function() {
+        var ids = [];
+        list.querySelectorAll('.image-item').forEach(function(el) {
+          ids.push(el.getAttribute('data-image-id'));
+        });
+        form.querySelectorAll('input[name="reorderImageIds"]').forEach(function(inp) { inp.remove(); });
+        var hid = document.createElement('input');
+        hid.type = 'hidden';
+        hid.name = 'reorderImageIds';
+        hid.value = ids.join(',');
+        form.appendChild(hid);
+
+        var replaceTargets = [];
+        list.querySelectorAll('.replace-input').forEach(function(inp) {
+          if (inp.files && inp.files.length > 0) replaceTargets.push(inp.getAttribute('data-target-id'));
+        });
+        form.querySelectorAll('input[name="replaceTargets"]').forEach(function(inp) { inp.remove(); });
+        if (replaceTargets.length) {
+          var rh = document.createElement('input');
+          rh.type = 'hidden';
+          rh.name = 'replaceTargets';
+          rh.value = replaceTargets.join(',');
+          form.appendChild(rh);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

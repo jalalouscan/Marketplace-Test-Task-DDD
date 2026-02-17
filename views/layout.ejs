@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= typeof title !== 'undefined' ? title : 'Admin Dashboard' %> | Marketplace</title>
+  <link rel="stylesheet" href="/dashboard.css">
+</head>
+<body>
+  <header class="header">
+    <a href="/dashboard" class="logo">Marketplace Admin</a>
+    <% if (typeof user !== 'undefined' && user) { %>
+      <nav class="nav">
+        <span class="user-email"><%= user.email %></span>
+        <a href="/dashboard/logout" class="btn btn-outline">Logout</a>
+      </nav>
+    <% } %>
+  </header>
+  <main class="main">
+    <%- body %>
+  </main>
+</body>
+</html>
